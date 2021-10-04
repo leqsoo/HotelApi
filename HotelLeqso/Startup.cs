@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelApi.Configurations;
 using HotelApi.Data;
+using HotelApi.IRepository;
+using HotelApi.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelApi
@@ -30,13 +32,15 @@ namespace HotelApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(op => op.SerializerSettings.ReferenceLoopHandling =
+                Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.AddCors(o =>
             {
                 o.AddPolicy("AllowAll", builder =>
                     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
             services.AddAutoMapper(typeof(MapperInitializer));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelApi", Version = "v1" });
@@ -62,6 +66,7 @@ namespace HotelApi
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllers();
             });
         }

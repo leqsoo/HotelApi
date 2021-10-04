@@ -11,7 +11,7 @@ namespace HotelApi.Models
     public class HotelDto : CreateHotelDto
     {
         public int Id { get; set; }
-        public Country Country { get; set; }
+        public CountryDTO Country { get; set; }
     }
     public class CreateHotelDto
     {

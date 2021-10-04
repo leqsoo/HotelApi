@@ -21,9 +21,30 @@ namespace HotelApi.Data
                 new Country { Id = 3, Name = "Cayman Islands", ShortName = "CI" }
                 );
             modelBuilder.Entity<Hotel>().HasData(
-                new Hotel { Id = 1, Name = "Super", Address = "Negrili", CountryId = 2 },
-                new Hotel { Id = 2, Name = "Spa", Address = "Negrili", CountryId = 3 },
-                new Hotel { Id = 3, Name = "Grand", Address = "Negrili", CountryId = 1 }
+                new Hotel
+                {
+                    Id = 1,
+                    Name = "Sandals Resort and Spa",
+                    Address = "Negril",
+                    CountryId = 1,
+                    Rating = 4.5
+                },
+                new Hotel
+                {
+                    Id = 2,
+                    Name = "Comfort Suites",
+                    Address = "George Town",
+                    CountryId = 3,
+                    Rating = 4.3
+                },
+                new Hotel
+                {
+                    Id = 3,
+                    Name = "Grand Palldium",
+                    Address = "Nassua",
+                    CountryId = 2,
+                    Rating = 4
+                }
                 );
         }
 
