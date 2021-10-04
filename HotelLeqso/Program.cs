@@ -11,7 +11,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace HotelLeqso
+namespace HotelApi
 {
     public class Program
     {

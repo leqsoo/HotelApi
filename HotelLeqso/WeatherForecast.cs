@@ -1,6 +1,6 @@
 using System;
 
-namespace HotelLeqso
+namespace HotelApi
 {
     public class WeatherForecast
     {
