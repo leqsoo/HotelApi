@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using HotelApi.Data;
 using HotelApi.IRepository;
 using HotelApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Utilities;
 
 namespace HotelApi.Controllers
 {
@@ -43,7 +46,8 @@ namespace HotelApi.Controllers
             }
         }
 
-        [HttpGet("{id:int}")]
+        [Authorize]
+        [HttpGet("{id:int}", Name = "GetHotel")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetHotel(int id)
@@ -57,6 +61,33 @@ namespace HotelApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Something went wrong in the {nameof(GetHotel)}");
+                return StatusCode(500, "Internal Server Error. Please try again later");
+            }
+        }
+
+        [Authorize(Roles = StringConstants.Admin)]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateHotel([FromBody] CreateHotelDto hotelDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST Attempt in {nameof(CreateHotel)}");
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var hotel = _mapper.Map<Hotel>(hotelDto);
+                await _unitOfWork.Hotels.Insert(hotel);
+                await _unitOfWork.Save();
+
+                return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in the {nameof(CreateHotel)}");
                 return StatusCode(500, "Internal Server Error. Please try again later");
             }
         }
