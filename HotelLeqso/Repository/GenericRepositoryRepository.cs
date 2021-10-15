@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using HotelApi.Data;
 using HotelApi.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Utilities;
+using X.PagedList;
 
 namespace HotelApi.GenericRepository
 {
@@ -26,7 +28,7 @@ namespace HotelApi.GenericRepository
 
         public void DeleteRange(IEnumerable<T> entities)
         {
-           _dbSet.RemoveRange(entities);
+            _dbSet.RemoveRange(entities);
         }
 
         public async Task<T> Get(System.Linq.Expressions.Expression<Func<T, bool>> expression, List<string> include = null)
@@ -65,6 +67,21 @@ namespace HotelApi.GenericRepository
             }
 
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IPagedList<T>> GetAll(RequestedParams requestedParams, List<string> includes = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return await query.AsNoTracking().ToPagedListAsync(requestedParams.PageNumber, requestedParams.PageSize);
         }
 
         public async Task Insert(T entity)

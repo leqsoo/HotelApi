@@ -10,7 +10,6 @@ namespace HotelApi.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-
         private readonly DatabaseContext _databaseContext;
         private IGenericRepository<Country> _countries;
         private IGenericRepository<Hotel> _hotels;

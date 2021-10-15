@@ -9,5 +9,6 @@ namespace Utilities
     public class StringConstants
     {
         public const string Admin = "Admin";
+        public const string Error500 = "Internal Server Error. Please try again later";
     }
 }

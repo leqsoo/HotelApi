@@ -20,4 +20,8 @@ namespace HotelApi.Models
         [StringLength(maximumLength: 2, ErrorMessage = "Short Country Name Is Too Long")]
         public string ShortName { get; set; }
     }
+    public class UpdateCountryDto : CreateCountryDTO
+    {
+
+    }
 }

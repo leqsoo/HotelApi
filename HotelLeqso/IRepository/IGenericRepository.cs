@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Utilities;
+using X.PagedList;
 
 namespace HotelApi.IRepository
 {
@@ -14,6 +16,7 @@ namespace HotelApi.IRepository
             List<string> include = null
             );
 
+        Task<IPagedList<T>> GetAll(RequestedParams requestedParams, List<string> includes = null);
         Task<T> Get(
             Expression<Func<T, bool>> expression,
             List<string> include = null

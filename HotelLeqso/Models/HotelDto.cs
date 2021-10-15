@@ -25,4 +25,8 @@ namespace HotelApi.Models
         [Required]
         public int CountryId { get; set; }
     }
+    public class UpdateHotelDto : CreateHotelDto
+    {
+
+    }
 }
