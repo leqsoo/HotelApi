@@ -2,6 +2,7 @@
 using HotelApi.Data;
 using HotelApi.IRepository;
 using HotelApi.Models;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ namespace HotelApi.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 120)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCountries([FromQuery] RequestedParams requestedParams)
@@ -38,11 +40,12 @@ namespace HotelApi.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCountry")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = false)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCountry(int id)
         {
-            throw new Exception();
             var country = await _unitOfWork.Countries.Get(c => c.Id == id, new List<string> { "Hotels" });
             var result = _mapper.Map<CountryDTO>(country);
             return Ok(result);

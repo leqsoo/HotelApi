@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HotelApi.Configurations;
 using HotelApi.Data;
 using HotelApi.IRepository;
@@ -6,6 +7,7 @@ using HotelApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,14 @@ namespace HotelApi
                 o.AddPolicy("AllowAll", builder =>
                     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
+
+            services.AddMemoryCache();
+
+            services.ConfigureRateLimiting();
+            services.AddHttpContextAccessor();
+
+            services.ConfigureHttpChacheHeaders();
+
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(Configuration);
@@ -42,8 +52,15 @@ namespace HotelApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelApi", Version = "v1" });
             });
-            services.AddControllers().AddNewtonsoftJson(op => op.SerializerSettings.ReferenceLoopHandling =
-           Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddControllers(config =>
+            {
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+                {
+                    Duration = 120
+                });
+            }).AddNewtonsoftJson(op => op.SerializerSettings.ReferenceLoopHandling =
+       Newtonsoft.Json.ReferenceLoopHandling.Ignore);
             services.ConfigureApiVersioning();
         }
 
@@ -60,6 +77,11 @@ namespace HotelApi
             app.ConfigureExeptionHandler();
             app.UseHttpsRedirection();
             app.UseCors("AllowAll");
+
+            app.UseHttpCacheHeaders();
+            app.UseResponseCaching();
+            app.UseIpRateLimiting();
+
             app.UseRouting();
 
             app.UseAuthentication();

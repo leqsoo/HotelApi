@@ -1,20 +1,20 @@
-﻿using System;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AspNetCoreRateLimit;
 using HotelApi.Data;
+using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using Utilities;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HotelApi
 {
@@ -69,7 +69,6 @@ namespace HotelApi
                 });
             });
         }
-
         public static void ConfigureApiVersioning(this IServiceCollection services)
         {
             services.AddApiVersioning(opt =>
@@ -78,6 +77,39 @@ namespace HotelApi
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.DefaultApiVersion = new ApiVersion(new DateTime(2021, 10, 15), 1, 0, "jk");
             });
+        }
+        public static void ConfigureHttpChacheHeaders(this IServiceCollection services)
+        {
+            services.AddResponseCaching();
+            services.AddHttpCacheHeaders(
+            expirationOpt =>
+            {
+                expirationOpt.MaxAge = 120;
+                expirationOpt.CacheLocation = CacheLocation.Private;
+            },
+            validationOpt =>
+            {
+                validationOpt.MustRevalidate = true;
+            });
+        }
+        public static void ConfigureRateLimiting(this IServiceCollection services)
+        {
+            var rateLimitRules = new List<RateLimitRule>
+            {
+                new RateLimitRule
+                {
+                    Endpoint = "*",
+                    Limit = 1,
+                    Period = "1s"
+                }
+            };
+            services.Configure<IpRateLimitOptions>(opt =>
+            {
+                opt.GeneralRules = rateLimitRules;
+            });
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
         }
     }
 }
