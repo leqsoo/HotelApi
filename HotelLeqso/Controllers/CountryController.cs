@@ -28,6 +28,7 @@ namespace HotelApi.Controllers
             _mapper = mapper;
         }
 
+
         [HttpGet]
         [ResponseCache(Duration = 120)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -119,4 +120,3 @@ namespace HotelApi.Controllers
         }
     }
 }
-
