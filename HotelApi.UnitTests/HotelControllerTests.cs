@@ -28,7 +28,7 @@ namespace HotelApi.UnitTests
         [Test]
         public async Task GetHotel_WhenHotelExists_ShouldReturnHotelById()
         {
-            var id = new int();
+            const int id = new();
             var hotelFromDb = new Hotel
             {
                 Id = id,
